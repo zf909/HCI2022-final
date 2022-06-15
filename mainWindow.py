@@ -67,9 +67,11 @@ class myMainWindow(Ui_Form, QMainWindow):
         self.video_full_screen_widget.hide()
         self.player = QMediaPlayer(self)
         self.player.setVideoOutput(self.video_area)
+
         self.playlist = QMediaPlaylist(self)
         self.player.setPlaylist(self.playlist)
         self.playlist.setPlaybackMode(QMediaPlaylist.Loop)
+
         self.video_list.itemClicked.connect(self.playVideoFromList)
         self.previous.clicked.connect(self.preMedia)
         self.next.clicked.connect(self.nextMedia)
@@ -78,6 +80,9 @@ class myMainWindow(Ui_Form, QMainWindow):
         self.player_volume.setTickPosition(QSlider.TicksBelow)
         self.player_volume.valueChanged.connect(self.changeVolume)
         self.fileOpenAction.triggered.connect(self.openVideoFile)
+
+        self.fileRemoveAction.triggered.connect(self.removeVideoFile)
+        # self.fileOpenAction.triggered.connect(self.openVideoFile)
         self.player.positionChanged.connect(self.changeSlide)  # change process slide of the video
         self.video_full_screen_widget.doubleClickedItem.connect(self.videoDoubleClicked)  # double click the video
         # self.video_area.doubleClickedItem.connect(self.videoDoubleClicked)
@@ -138,18 +143,38 @@ class myMainWindow(Ui_Form, QMainWindow):
         mediaUrl = QFileDialog.getOpenFileUrl()[0]
         self.player.setMedia(QMediaContent(mediaUrl))  # 选取视频文件
         content = QListWidgetItem(mediaUrl.toString())
+
         self.video_list.addItem(content)
         self.playlist.addMedia(QMediaContent(mediaUrl))
+
         if self.player.state() != QMediaPlayer.PlayingState:
-            self.playlist.setCurrentIndex(0)
+            self.playlist.setCurrentIndex(self.playlist.currentIndex()+1)
             self.player.play()
 
+        #self.play_button2.setPixmap(QPixmap('C:\\Users\\86133\\Desktop\\HCI2022-final-main (1)\\HCI2022-final-main\\assets\\pause.png'))
         self.play_button2.setPixmap(QPixmap('D:\\HCI2022\\final\\assets\\pause.png'))
         self.play_button2.clicked.connect(self.pauseVideo)
         self.player.play()
 
+    def removeVideoFile(self):
+        # mediaUrl = QFileDialog.getOpenFileUrl()[0]
+        # self.player.setMedia(QMediaContent(mediaUrl))  # 选取视频文件
+        # content = QListWidgetItem(mediaUrl.toString())
+        # nextIndex
+        #self.video_list.addItem(content)
+        print(self.playlist.currentIndex())
+
+        self.video_list.takeItem(self.playlist.currentIndex())
+        self.playlist.removeMedia(self.playlist.currentIndex())
+        #self.playlist.setCurrentIndex(self.playlist.nextIndex())
+        self.player.setMedia(self.playlist.media(self.playlist.currentIndex()))
+        print(self.playlist.currentIndex())
+
+        self.player.play()
+
     def playVideo(self):
         self.player.play()
+        #self.play_button2.setPixmap(QPixmap('C:\\Users\\86133\\Desktop\\HCI2022-final-main (1)\\HCI2022-final-main\\assets\\pause.png'))
         self.play_button2.setPixmap(QPixmap('D:\\HCI2022\\final\\assets\\pause.png'))
         self.play_button2.clicked.disconnect()
         self.play_button2.clicked.connect(self.pauseVideo)
@@ -157,6 +182,7 @@ class myMainWindow(Ui_Form, QMainWindow):
     def pauseVideo(self):
         self.player.pause()
         self.play_button2.clicked.disconnect()
+        #self.play_button2.setPixmap(QPixmap('C:\\Users\\86133\\Desktop\\HCI2022-final-main (1)\\HCI2022-final-main\\assets\\play-button.png'))
         self.play_button2.setPixmap(QPixmap('D:\\HCI2022\\final\\assets\\play-button.png'))
         self.play_button2.clicked.connect(self.playVideo)
 
